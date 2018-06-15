@@ -1,12 +1,34 @@
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import txn.Transaction
+import java.security.Security
 
 var chain: ArrayList<Block> = ArrayList()
 val gson: Gson = GsonBuilder().setPrettyPrinting().create()
 
+lateinit var walletA: Wallet
+lateinit var walletB: Wallet
+
 
 fun main(args: Array<String>) {
 
+    Security.addProvider(BouncyCastleProvider())
+
+    walletA = Wallet()
+    walletB = Wallet()
+
+    println("Public and private keys \n${StringUtil.getStringFromKey(walletA.publicKey)}\n${StringUtil.getStringFromKey(walletA.privateKey)}")
+
+    val transaction = Transaction(walletA.publicKey,walletB.publicKey,5F, ArrayList())
+    transaction.generateSignature(walletA.privateKey)
+
+    println("Is signature verified ${transaction.verifySignature()}")
+
+
+}
+
+fun buildBlocks(){
     val genesisBlock = Block("Hi, I'm the first block", "0")
     chain.add(genesisBlock)
     chain[0].mineBlock(Block.difficulty)
@@ -44,8 +66,6 @@ fun main(args: Array<String>) {
     chain[8].mineBlock(Block.difficulty)
 
     println(gson.toJson(chain))
-
-    println("Is the chain valid: " + BlockRunner.isChainValid())
 }
 
 

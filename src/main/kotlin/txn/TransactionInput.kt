@@ -1,0 +1,4 @@
+package txn
+
+class TransactionInput {
+}
